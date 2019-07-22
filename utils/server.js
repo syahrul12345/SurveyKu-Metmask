@@ -130,13 +130,18 @@ server.get('/getAllSurveys',async(req,res) => {
 })
 
 /**
-@notice Get all questions and their options
+@notice Get all questions and their options with values values
 @dev
 **/
 server.post('/getQuestions',async(req,res) => {
 	try {
 		const surveyAddress = req.body.surveyAddress;
 		const trackerContract = await getTracker(interface,bytecode,TrackerAddresses.last());
+		const surveyTitle = await trackerContract.methods.getSurveyTitleByAddress(surveyAddress).call({})
+		const finalOutput = {
+			title:'',
+			questions:[]
+		}
 		trackerContract.methods.getSurveyQuestionArray(surveyAddress).call({}).then((result) => {
 			const promiseArray = []
 			result.forEach((item) => {
@@ -144,17 +149,59 @@ server.post('/getQuestions',async(req,res) => {
 			})
 			Promise.all(promiseArray).then((result) => {
 		      const output = result.map(x => {
-            const question = web3.utils.toAscii(x['0']);
+	            const text = web3.utils.hexToUtf8(x['0']);
+	            const options = bytes32toString(x['1']);
+		      	return {
+		              text,
+		              options,
+		        };
+			  });
+		       finalOutput.title = surveyTitle;
+		       finalOutput.questions = output
+			   res.send(finalOutput);
+				      
+			})
+		})
+
+  }catch (ex){
+      res.status(500).send(ex.toString())
+      console.log(ex)
+  }
+})
+
+
+/**
+@notice Get all questions and their options with values values
+@dev
+**/
+server.post('/getAnswers',async(req,res) => {
+	try {
+		const surveyAddress = req.body.surveyAddress;
+		const trackerContract = await getTracker(interface,bytecode,TrackerAddresses.last());
+		const surveyTitle = await trackerContract.methods.getSurveyTitleByAddress(surveyAddress).call({})
+		const finalOutput = {
+			title:'',
+			questions:[]
+		}
+		trackerContract.methods.getSurveyQuestionArray(surveyAddress).call({}).then((result) => {
+			const promiseArray = []
+			result.forEach((item) => {
+				promiseArray.push(trackerContract.methods.getOptions(surveyAddress,item).call({}))
+			})
+			Promise.all(promiseArray).then((result) => {
+		      const output = result.map(x => {
+            const text = web3.utils.hexToUtf8(x['0']);
             const options = bytes32toString(x['1']);
             const values = hexToNumber(x['2'])
 		      	return {
-              question,
+              text,
               options,
               values
             };
 		      });
-
-		      res.send(output);
+		       finalOutput.title = surveyTitle;
+		       finalOutput.questions = output
+			   res.send(finalOutput);
 		      
 			})
 		})
@@ -246,7 +293,7 @@ async function stringToBytes32(optionArray) {
 function bytes32toString(optionArray) {
     const tempArray = [];
     optionArray.forEach((item) => {
-        tempArray.push(web3.utils.toAscii(item))
+        tempArray.push(web3.utils.hexToUtf8(item))
     })
     return tempArray;
 }
@@ -259,24 +306,6 @@ function hexToNumber(optionArray ) {
     return tempArray;
 }
  
-
-function bytes32toString(optionArray) {
-	const tempArray = [];
-	optionArray.forEach((item) => {
-		tempArray.push(web3.utils.toAscii(item))
-	})
-	return tempArray;
-}
-
-function hexToNumber(optionArray ) {
-	const tempArray = [];
-	optionArray.forEach((item) => {
-		tempArray.push(web3.utils.hexToNumber(item["_hex"]))
-	})
-	return tempArray;
-}
-
-
 /**
 @notice Helper function to get last Array
 @dev
