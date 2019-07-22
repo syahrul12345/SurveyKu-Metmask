@@ -23,29 +23,6 @@ server.use(function(req, res, next) {
   next();
 });
 
-/**
-@notice Creates a new tracker contract
-@dev Call this ONLY when u want to create a new tracker contract. Be sure to update the address
-@dev all trackers are stored in the trackers.json file
-**/
-// server.get('/createTracker',async(req,res) => {
-// 	deployTracker(interface,bytecode).then((address) => {
-// 		TrackerAddresses.push(address)
-// 		json = JSON.stringify(TrackerAddresses)
-// 		fs.writeFile('./utils/trackers.json',json,'utf8',(err,data) => {
-// 			if(err) {
-// 				console.log("Failed to write new tracker to trackers.json")
-// 			}else {
-// 				console.log(`Sucesfully saved new tracker address: ${address}`)
-// 				res.send(TrackerAddresses.last())
-// 				res.end()
-// 			}
-// 		})
-		
-// 	})
-// })
-
-
 server.get('/getSurveyIds',async(req,res) => {
 	const trackerContract = await getTracker(interface,bytecode,TrackerAddresses.last())
 	trackerContract.methods.getSurveyIds().call({
@@ -139,8 +116,8 @@ server.get('/getAllSurveys',async(req,res) => {
 		})
 		Promise.all(promiseArray).then((result) => {
       const output = result.map(x => {
-        const index = Object.keys(x).length - 1;
-        x[index] = web3.utils.hexToNumber(x[index][Object.keys(x[index])[0]]);
+        x[2] = web3.utils.hexToNumber(x[2]['_hex']);
+
         return x;
       });
 
@@ -165,31 +142,27 @@ server.post('/getQuestions',async(req,res) => {
 			result.forEach((item) => {
 				promiseArray.push(trackerContract.methods.getOptions(surveyAddress,item).call({}))
 			})
-			Promise.all(promiseArray).then(async (result) => {
-		      const output = await result.map(x => {
-		      	// console.log(x);
-		      	// Object.keys(x)
-		      	const promiseArray = []
-		      	const question = web3.utils.toAscii(x['0']);
-		      	options = bytes32toString(x['1'])
-		      	answers = hexToNumber(x['2'])
-		      	promiseArray.push(options,answers)
-		      	Promise.all(promiseArray).then((result) => {
-		      		var obj =  {text:question,options:result[0],values:result[1]}
-		      		console.log(obj)
-		      			
-		      	})
-		      	
-		      })
-		      res.send(output)
+			Promise.all(promiseArray).then((result) => {
+		      const output = result.map(x => {
+            const question = web3.utils.toAscii(x['0']);
+            const options = bytes32toString(x['1']);
+            const values = hexToNumber(x['2'])
+		      	return {
+              question,
+              options,
+              values
+            };
+		      });
+
+		      res.send(output);
 		      
 			})
 		})
 
-	}catch (ex){
-		res.status(500).send(ex.toString())
-		console.log(ex)
-	}
+  }catch (ex){
+      res.status(500).send(ex.toString())
+      console.log(ex)
+  }
 })
 
 /**
@@ -269,9 +242,25 @@ async function stringToBytes32(optionArray) {
 	})
 	return tempArray;
 }
+
+function bytes32toString(optionArray) {
+    const tempArray = [];
+    optionArray.forEach((item) => {
+        tempArray.push(web3.utils.toAscii(item))
+    })
+    return tempArray;
+}
+
+function hexToNumber(optionArray ) {
+    const tempArray = [];
+    optionArray.forEach((item) => {
+        tempArray.push(web3.utils.hexToNumber(item["_hex"]))
+    })
+    return tempArray;
+}
  
 
-async function bytes32toString(optionArray) {
+function bytes32toString(optionArray) {
 	const tempArray = [];
 	optionArray.forEach((item) => {
 		tempArray.push(web3.utils.toAscii(item))
@@ -279,7 +268,7 @@ async function bytes32toString(optionArray) {
 	return tempArray;
 }
 
-async function hexToNumber(optionArray ) {
+function hexToNumber(optionArray ) {
 	const tempArray = [];
 	optionArray.forEach((item) => {
 		tempArray.push(web3.utils.hexToNumber(item["_hex"]))
