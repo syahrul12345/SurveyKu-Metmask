@@ -201,14 +201,20 @@ server.post('/answerQuestion',async(req,res) => {
 					gas:470000000,
 				}))
 			})
+			//updates the participant count
+			promiseArray2.push(trackerContract.methods.updateParticipants(surveyAddress).send({
+				from:account,
+				gas:470000000,
+			}))
 			Promise.all(promiseArray2).then((result) => {
 				result.forEach((item)=> {
-					console.log(item.transactionHash)
+					if(item.transactionHash != undefined) {
+						console.log(`Succesfully answered with txhash:${item.transactionHash}`)
+					}
 				})
 				res.send('success')
 				res.end()
 			})
-
 		}) 
 	}catch(ex) {
 		res.status(500).send(ex.toString())

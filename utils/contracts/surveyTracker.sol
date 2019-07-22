@@ -6,6 +6,8 @@ interface Survey {
 	 function getTitle() external view returns(string memory);
 	 function getOption(bytes32 _question) external view returns(bytes32[] memory,uint256[] memory);
 	 function answerQuestion(bytes32 _question,bytes32 _answers) external returns (bool success);
+	 function updateParticipants() external;
+	 function getParticipants() external view returns(uint256);
 }
 
 /**
@@ -66,9 +68,10 @@ contract SurveyTracker {
 	@notice Get survey titleByid
 	@dev Id runs from 0. Call it as a parms into this function. First we need to get survey Address
 	**/
-	function getSurveyTitleById(uint256 _surveyId) external view returns (string memory,address) {
+	function getSurveyTitleById(uint256 _surveyId) external view returns (string memory,address,uint) {
 		Survey survey = Survey(surveyAddressMap[_surveyId]);
-		return (survey.getTitle(),surveyAddressMap[_surveyId]);
+		return (survey.getTitle(),surveyAddressMap[_surveyId],survey.getParticipants());
+
 	}
 	/**
 	@notice Get all surveyQuestion IDS
@@ -102,5 +105,13 @@ contract SurveyTracker {
 	function answerQuestion(address _surveyAddress,bytes32 _question,bytes32 _answer) external returns(bool success) {
 		Survey survey = Survey(_surveyAddress);
 		return survey.answerQuestion(_question,_answer);
+	}
+	/**
+	@notice Update the participant count for the survey
+	@dev Call this once at the end of every qestion
+	**/ 
+	function updateParticipants(address _surveyAddress) external {
+		Survey survey = Survey(_surveyAddress);
+		survey.updateParticipants();
 	}	
 }	
