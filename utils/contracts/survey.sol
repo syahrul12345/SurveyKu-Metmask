@@ -23,6 +23,7 @@ contract Survey {
     mapping(bytes32 => Question) questions;
     bytes32[] private questionIds;
     bytes32[] private questionArray;
+    uint256 private participants;
     /**
     @notice Consturtor creates the survey 
     @dev Only Sets the title. So the iterator has to be set over web3
@@ -67,22 +68,32 @@ contract Survey {
     function getTitle() external view returns(string memory) {
         return title;
     }
+    function getParticipants() external view returns(uint256) {
+        return participants;
+    }
     /**
     @notice Returns all possible answerKeys for each particular question
     @dev Put the questionKey in the body.
     **/
     function getOption(bytes32 _question) external view returns(bytes32[] memory,uint256[] memory) {
         bytes32 questionId = keccak256(abi.encodePacked(_question));
-        bytes32[] memory questionArray = new bytes32[](questions[questionId].answerKeys.length);
-        uint256[] memory countArray = new uint256[](questions[questionId].answerKeys.length);
+        bytes32[] memory questionArray2 = new bytes32[](questions[questionId].answerKeys.length);
+        uint256[] memory countArray2 = new uint256[](questions[questionId].answerKeys.length);
         for(uint i = 0; i<questions[questionId].answerKeys.length;i++) {
             bytes32 text = questions[questionId].answerMap[questions[questionId].answerKeys[i]].text;
             uint256 count = questions[questionId].answerMap[questions[questionId].answerKeys[i]].count;
-            questionArray[i] = text;
-            countArray[i] = count;
+            questionArray2[i] = text;
+            countArray2[i] = count;
         }
-        require(questionArray.length == countArray.length);
-        return (questionArray,countArray);
+        require(questionArray2.length == countArray2.length);
+        return (questionArray2,countArray2);
     }
+    /**
+    @notice Update the participant count
+    @dev Burden function
+    **/
+    function updateParticipants() external{
+        participants++;
+    }
+}   
 
-}
