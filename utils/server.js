@@ -138,7 +138,14 @@ server.get('/getAllSurveys',async(req,res) => {
 			promiseArray.push(trackerContract.methods.getSurveyTitleById(item).call({}))
 		})
 		Promise.all(promiseArray).then((result) => {
-			res.send(result)
+      const output = result.map(x => {
+        const index = Object.keys(x).length - 1;
+        x[index] = web3.utils.hexToNumber(x[index][Object.keys(x[index])[0]]);
+
+        return x;
+      });
+
+			res.send(output);
 		})
 	} catch(ex) {
 		res.status(500).send(ex.toString())
