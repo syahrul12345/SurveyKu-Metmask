@@ -4,7 +4,7 @@
       v-toolbar-title.headline.text-uppercase
         router-link.homeIcon.mr-2(to="/") SurveyKu
       v-spacer
-      v-btn(href='https://nd-714-641-739.int.chainstack.com/transactions', target='_blank' color="primary")
+      v-btn(:href='explorer', target='_blank' color="primary" :disabled="!explorer")
         span.mr-2 Explorer
     v-content
       router-view
@@ -25,6 +25,7 @@ export default {
     return {
       snackbar: false,
       snackMsg: 'oh no, something seems wrong',
+      explorer: null,
     };
   },
   methods: {
@@ -34,6 +35,11 @@ export default {
     },
   },
   created() {
+    axios.get('/explorer')
+      .then(res => {
+        this.explorer = res.data;
+      });
+
     this.$eventHub.$on('showSnack', this.showSnack);
   },
   destroyed() {

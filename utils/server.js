@@ -15,7 +15,6 @@ const server = new express();
 const port = 3334;
 
 const TrackerAddresses = JSON.parse(fs.readFileSync('./utils/trackers.json'));
-
 /**
 @notice This is the defeault tracker address
 @dev If you create a new Tracker, this is automatically updated.
@@ -31,19 +30,23 @@ server.use(function(req, res, next) {
   next();
 });
 
+server.get('/explorer', async (req, res) => {
+  res.send(process.env.URL);
+});
 
-server.get('/getSurveyIds',async(req,res) => {
-	const trackerContract = await getTracker(interface,bytecode,TrackerAddresses.last())
-	trackerContract.methods.getSurveyIds().call({
-	}).then((result) => {
-		res.send(result)
-	})
-})
-server.get('/explorer',async(req,res) => {
-	return process.env.URL;
-})
-
-
+server.get('/getSurveyIds', async (req, res) => {
+  const trackerContract = await getTracker(
+    interface,
+    bytecode,
+    TrackerAddresses.last(),
+  );
+  trackerContract.methods
+    .getSurveyIds()
+    .call({})
+    .then(result => {
+      res.send(result);
+    });
+});
 
 /**
 @notice Creats a new survey and populates accordingly with 
