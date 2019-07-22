@@ -1,7 +1,6 @@
 const {getAddress,deployContract,deployTracker,getTracker} = require('./deploy.js')
 const {compileContract} = require('./utils/compiler.js');
 const {interface,bytecode} = require('./utils/reference.js')
-
 const fs = require('fs-extra')
 const Web3 = require('web3');
 const web3 = new Web3()
@@ -10,11 +9,12 @@ const bodyParser = require('body-parser');
 const server = new express();
 const port = 3334;
 
+const TrackerAddresses = JSON.parse(fs.readFileSync('./utils/trackers.json'))
+
 /**
 @notice This is the defeault tracker address
 @dev If you create a new Tracker, this is automatically updated.
 **/
-const TrackerAddresses = JSON.parse(fs.readFileSync('./utils/trackers.json'))
 server.use(bodyParser())
 
 server.use(function(req, res, next) {
@@ -28,22 +28,22 @@ server.use(function(req, res, next) {
 @dev Call this ONLY when u want to create a new tracker contract. Be sure to update the address
 @dev all trackers are stored in the trackers.json file
 **/
-server.get('/createTracker',async(req,res) => {
-	deployTracker(interface,bytecode).then((address) => {
-		TrackerAddresses.push(address)
-		json = JSON.stringify(TrackerAddresses)
-		fs.writeFile('./utils/trackers.json',json,'utf8',(err,data) => {
-			if(err) {
-				console.log("Failed to write new tracker to trackers.json")
-			}else {
-				console.log(`Sucesfully saved new tracker address: ${address}`)
-				res.send(TrackerAddresses.last())
-				res.end()
-			}
-		})
+// server.get('/createTracker',async(req,res) => {
+// 	deployTracker(interface,bytecode).then((address) => {
+// 		TrackerAddresses.push(address)
+// 		json = JSON.stringify(TrackerAddresses)
+// 		fs.writeFile('./utils/trackers.json',json,'utf8',(err,data) => {
+// 			if(err) {
+// 				console.log("Failed to write new tracker to trackers.json")
+// 			}else {
+// 				console.log(`Sucesfully saved new tracker address: ${address}`)
+// 				res.send(TrackerAddresses.last())
+// 				res.end()
+// 			}
+// 		})
 		
-	})
-})
+// 	})
+// })
 
 
 server.get('/getSurveyIds',async(req,res) => {
@@ -160,7 +160,14 @@ server.post('/getQuestions',async(req,res) => {
 				promiseArray.push(trackerContract.methods.getOptions(surveyAddress,item).call({}))
 			})
 		Promise.all(promiseArray).then((result) => {
-			res.send(result)
+      console.log(result);
+      // const web3 = new Web3()
+      const abc = result.map(x => {
+        console.log(x);
+
+        return x;
+      });
+			res.send(abc);
 		})
 		})
 
