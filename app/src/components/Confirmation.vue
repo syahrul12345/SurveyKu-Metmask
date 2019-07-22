@@ -74,17 +74,22 @@ export default {
             this.$router.push({ name: 'home' });
           });
       } else {
-        const payload = pick(['userId', 'surveyId'], this.survey);
-        const answers = map(x => x, pluck(['answer'], this.questions));
-        payload.surveyId = this.$route.params.survey_id;
+        const address = this.$route.params.survey_address;
+        const answers = this.questions.map(x => {
+          return {
+            text: x.text,
+            option: x.answer,
+          };
+        });
 
         this.isLoading = true;
-        axios.post('/answerSurvey', mergeRight(payload, { answers }))
+        axios.post('/answerQuestion', { address, answers })
           .then((res) => {
             this.isLoading = false;
             this.$emit('hide');
 
-            this.$router.push({ name: 'SurveyResult', params: { survey_id: payload.surveyId } });
+            this.$router.push({ name: 'SurveyResult', params: {survey_address: address,
+            }});
           });
       }
     },

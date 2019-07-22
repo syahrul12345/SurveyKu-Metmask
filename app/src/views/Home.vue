@@ -1,14 +1,19 @@
 <template lang="pug">
-  v-layout(row wrap)
-    v-btn(:to="{ name: 'CreateSurvey' }") Create New Survey
+  v-container
+    v-layout(row wrap)
+      v-flex(xs12)
+        v-btn.mx-0.mb-2(:to="{ name: 'CreateSurvey' }") Create New Survey
+      v-flex(xs12)
+        v-data-table.elevation-1(:headers='headers', :items='surveys' hide-actions)
+          template(v-slot:items='props')
+            td 
+              v-btn.primary(:to="{ name: 'AnswerSurvey', params: { survey_address: props.item.address }}") {{ props.item.title }}
+            td {{ props.item.address }}
+            td {{ props.item.participants }}
+            td
+              v-btn(icon, small, :to="{ name: 'SurveyResult', params: { survey_address: props.item.address }}")
+                v-icon show_chart
 
-    //- v-btn(:to="{ name: 'AnswerSurvey', params: { survey_id: 10 } }") Demo Survey
-
-    v-data-table.elevation-1(:headers='headers', :items='surveys')
-      template(v-slot:items='props')
-        td 
-          v-btn.primary(:to="{ name: 'AnswerSurvey', params: { survey_address: props.item.address }}") {{ props.item.title }}
-        td {{ props.item.address }}
 
 </template>
 
@@ -37,6 +42,8 @@ export default {
       headers: [
         { text: 'Title', value: 'title' },
         { text: 'Address', value: 'address' },
+        { text: 'Participants', value: 'participants'},
+        {},
       ],
     };
   },
@@ -44,7 +51,7 @@ export default {
   created() {
     axios.get('/getAllSurveys')
       .then(res => {
-        this.surveys = res.data.map(survey => zipObj(['title', 'address'], values(survey)));
+        this.surveys = res.data.map((survey) => zipObj(['title', 'address', 'participants'], values(survey)));
       });
   },
 

@@ -12,7 +12,6 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home,
-      props: true,
     },
     {
       path: '/create',
@@ -23,11 +22,13 @@ export default new Router({
       path: '/answer/:survey_address',
       name: 'AnswerSurvey',
       component: () => import(/* webpackChunkName: "about" */ './views/AnswerSurvey.vue'),
+      props: true,
     },
     {
-      path: '/result/:survey_id',
+      path: '/result/:survey_address',
       name: 'SurveyResult',
       component: () => import(/* webpackChunkName: "about" */ './views/SurveyResult.vue'),
+      props: true,
     },
   ],
 });

@@ -14,7 +14,7 @@
               v-for='(option, key) in question.options',
               :key="'answer'+key",
               :label='option',
-              :value='key',
+              :value='option',
             )
 
         v-flex(xs12 v-else)
@@ -94,7 +94,7 @@ export default {
       },
       set(val) {
         this.$emit(
-          'update',
+          'updateAnswer',
           mergeRight(this.question, {
             answer: val,
           }),
