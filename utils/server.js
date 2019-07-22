@@ -134,32 +134,29 @@ server.get('/getAllSurveys',async(req,res) => {
 @dev
 **/
 server.post('/getQuestions',async(req,res) => {
-  try {
-      const surveyAddress = req.body.surveyAddress;
-      const trackerContract = await getTracker(interface,bytecode,TrackerAddresses.last());
-      trackerContract.methods.getSurveyQuestionArray(surveyAddress).call({}).then((result) => {
-          const promiseArray = []
-          result.forEach((item) => {
-              promiseArray.push(trackerContract.methods.getOptions(surveyAddress,item).call({}))
-          })
-          Promise.all(promiseArray).then(async (result) => {
-            const output = await result.map(x => {
-                const promiseArray = []
-                const question = web3.utils.toAscii(x['0']);
-                options = bytes32toString(x['1'])
-                answers = hexToNumber(x['2'])
-                promiseArray.push(options,answers)
-                Promise.all(promiseArray).then((result) => {
-                    var obj =  {text:question.replace('\u0000', ''),options:result[0],values:result[1]}
-                    console.log(obj)
-                })
-                
-            })
+	try {
+		const surveyAddress = req.body.surveyAddress;
+		const trackerContract = await getTracker(interface,bytecode,TrackerAddresses.last());
+		trackerContract.methods.getSurveyQuestionArray(surveyAddress).call({}).then((result) => {
+			const promiseArray = []
+			result.forEach((item) => {
+				promiseArray.push(trackerContract.methods.getOptions(surveyAddress,item).call({}))
+			})
+			Promise.all(promiseArray).then((result) => {
+		      const output = result.map(x => {
+            const text = web3.utils.toAscii(x['0']);
+            const options = bytes32toString(x['1']);
 
-            res.send(result)
-            
-          })
-      })
+		      	return {
+              text,
+              options,
+            };
+		      });
+
+		      res.send(output);
+		      
+			})
+		})
 
   }catch (ex){
       res.status(500).send(ex.toString())
@@ -245,7 +242,7 @@ async function stringToBytes32(optionArray) {
 	return tempArray;
 }
 
-async function bytes32toString(optionArray) {
+function bytes32toString(optionArray) {
     const tempArray = [];
     optionArray.forEach((item) => {
         tempArray.push(web3.utils.toAscii(item))
@@ -253,7 +250,7 @@ async function bytes32toString(optionArray) {
     return tempArray;
 }
 
-async function hexToNumber(optionArray ) {
+function hexToNumber(optionArray ) {
     const tempArray = [];
     optionArray.forEach((item) => {
         tempArray.push(web3.utils.hexToNumber(item["_hex"]))
@@ -261,6 +258,24 @@ async function hexToNumber(optionArray ) {
     return tempArray;
 }
  
+
+function bytes32toString(optionArray) {
+	const tempArray = [];
+	optionArray.forEach((item) => {
+		tempArray.push(web3.utils.toAscii(item))
+	})
+	return tempArray;
+}
+
+function hexToNumber(optionArray ) {
+	const tempArray = [];
+	optionArray.forEach((item) => {
+		tempArray.push(web3.utils.hexToNumber(item["_hex"]))
+	})
+	return tempArray;
+}
+
+
 /**
 @notice Helper function to get last Array
 @dev
