@@ -141,7 +141,6 @@ server.get('/getAllSurveys',async(req,res) => {
       const output = result.map(x => {
         const index = Object.keys(x).length - 1;
         x[index] = web3.utils.hexToNumber(x[index][Object.keys(x[index])[0]]);
-
         return x;
       });
 
@@ -166,16 +165,25 @@ server.post('/getQuestions',async(req,res) => {
 			result.forEach((item) => {
 				promiseArray.push(trackerContract.methods.getOptions(surveyAddress,item).call({}))
 			})
-		Promise.all(promiseArray).then((result) => {
-      console.log(result);
-      // const web3 = new Web3()
-      const abc = result.map(x => {
-        console.log(x);
-
-        return x;
-      });
-			res.send(abc);
-		})
+			Promise.all(promiseArray).then(async (result) => {
+		      const output = await result.map(x => {
+		      	// console.log(x);
+		      	// Object.keys(x)
+		      	const promiseArray = []
+		      	const question = web3.utils.toAscii(x['0']);
+		      	options = bytes32toString(x['1'])
+		      	answers = hexToNumber(x['2'])
+		      	promiseArray.push(options,answers)
+		      	Promise.all(promiseArray).then((result) => {
+		      		var obj =  {text:question,options:result[0],values:result[1]}
+		      		console.log(obj)
+		      			
+		      	})
+		      	
+		      })
+		      res.send(output)
+		      
+			})
 		})
 
 	}catch (ex){
@@ -262,6 +270,24 @@ async function stringToBytes32(optionArray) {
 	return tempArray;
 }
  
+
+async function bytes32toString(optionArray) {
+	const tempArray = [];
+	optionArray.forEach((item) => {
+		tempArray.push(web3.utils.toAscii(item))
+	})
+	return tempArray;
+}
+
+async function hexToNumber(optionArray ) {
+	const tempArray = [];
+	optionArray.forEach((item) => {
+		tempArray.push(web3.utils.hexToNumber(item["_hex"]))
+	})
+	return tempArray;
+}
+
+
 /**
 @notice Helper function to get last Array
 @dev
