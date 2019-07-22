@@ -20,7 +20,7 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/CreateSurvey.vue'),
     },
     {
-      path: '/answer/:survey_id',
+      path: '/answer/:survey_address',
       name: 'AnswerSurvey',
       component: () => import(/* webpackChunkName: "about" */ './views/AnswerSurvey.vue'),
     },

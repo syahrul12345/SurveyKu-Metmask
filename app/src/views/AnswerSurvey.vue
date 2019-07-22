@@ -1,5 +1,5 @@
 <template lang="pug">
-    Survey(:surveyData="survey" v-if="doneLoading")
+    h1 woohoo!
 </template>
 
 <script>
@@ -10,7 +10,7 @@ export default {
     Survey,
   },
   created() {
-    this.getSurvey(this.$route.params.survey_id);
+    this.getSurvey(this.$route.params.survey_address);
   },
   data() {
     return {
@@ -19,12 +19,13 @@ export default {
     };
   },
   methods: {
-    getSurvey(surveyId) {
-      axios.post('/getSurvey', { surveyId })
+    getSurvey(surveyAddress) {
+      axios.post('/getQuestions', { surveyAddress })
         .then((res) => {
-          this.survey = res.data.survey;
-          this.survey.userId = 'grab_xuwhh12';
-          this.doneLoading = true;
+          console.log(res);
+          // this.survey = res.data.survey;
+          // this.survey.userId = 'grab_xuwhh12';
+          // this.doneLoading = true;
         });
     },
   },

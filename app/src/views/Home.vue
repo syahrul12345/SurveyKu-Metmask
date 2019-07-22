@@ -2,22 +2,22 @@
   v-layout(row wrap)
     v-btn(:to="{ name: 'CreateSurvey' }") Create New Survey
 
-    v-btn(:to="{ name: 'AnswerSurvey', params: { survey_id: 10 } }") Demo Survey
+    //- v-btn(:to="{ name: 'AnswerSurvey', params: { survey_id: 10 } }") Demo Survey
 
-    //- v-data-table.elevation-1(:headers='headers', :items='desserts')
-    //-   template(v-slot:items='props')
-    //-     | {{ props.item.name }}
-    //-     | {{ props.item.calories }}
-    //-     | {{ props.item.fat }}
-    //-     | {{ props.item.carbs }}
-    //-     | {{ props.item.protein }}
-    //-     | {{ props.item.iron }}
-
-
+    v-data-table.elevation-1(:headers='headers', :items='surveys')
+      template(v-slot:items='props')
+        td 
+          v-btn.primary(:to="{ name: 'AnswerSurvey', params: { survey_address: props.item.address }}") {{ props.item.title }}
+        td {{ props.item.address }}
 
 </template>
 
 <script>
+import {
+  values,
+  zipObj,
+} from 'ramda';
+
 export default {
   name: 'Home',
   props: {
@@ -33,12 +33,10 @@ export default {
 
   data() {
     return {
+      surveys: [],
       headers: [
-        { text: 'Title', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' }
+        { text: 'Title', value: 'title' },
+        { text: 'Address', value: 'address' },
       ],
     };
   },
@@ -46,7 +44,7 @@ export default {
   created() {
     axios.get('/getAllSurveys')
       .then(res => {
-        console.log(res);
+        this.surveys = res.data.map(survey => zipObj(['title', 'address'], values(survey)));
       });
   },
 

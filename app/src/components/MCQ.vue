@@ -3,7 +3,7 @@
     v-card
       v-card-title.pb-0
         .sub-heading.w-100.pb-2 Question {{ questionNum + 1 }}
-        .title(v-if="!isEdit || readonly") {{ question.question }}
+        .title(v-if="!isEdit || readonly") {{ question.text }}
       v-card-title
         v-flex(xs12 v-if="!isEdit || readonly")
           v-radio-group.mt-0(
@@ -104,7 +104,7 @@ export default {
 
     value: {
       get() {
-        return this.question.question;
+        return this.question.text;
       },
       set(val) {
         this.$emit(

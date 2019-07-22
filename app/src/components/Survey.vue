@@ -76,19 +76,19 @@ export default {
       questions: [
         {
           id: Date.now()+1,
-          question: "What is your favourite activity",
+          text: "What is your favourite activity",
           options: ['Hulahoop Challenge','Mask invasion','Pitch Workshop','Business Model Canvas'],
           readonly: true,
         },
         {
           id: Date.now()+3,
-          question: 'Who is the most attractive :)',
+          text: 'Who is the most attractive :)',
           options: ['Jonas for sure','Jasmine obviously','Nicole Upchurch duh?','of course Chirag Batra'],
           readonly: true,
         },
         {
           id: Date.now()+2,
-          question: 'Which Sponsor is your favorite?',
+          text: 'Which Sponsor is your favorite?',
           options: ['Angelhack','Grab','Centrality ','IBM'],
           readonly: true,
         }
@@ -134,7 +134,7 @@ export default {
     addQuestion() {
       this.questions.push({
         id: Date.now(),
-        question: 'What is your favourite food?',
+        text: 'What is your favourite food?',
         options: ['Nasi Lemak', 'Pasta','Pizza'],
         readonly: false,
       });
