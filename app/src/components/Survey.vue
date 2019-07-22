@@ -15,6 +15,7 @@ v-container(grid-list-md)
           :questionNum="key",
           :isEdit="isEdit",
           @update="update($event)",
+          @updateAnswer="updateAnswer($event, key)",
           @addOption="addOption",
           @removeQuestion="removeQuestion($event)",
           @removeOption="removeOption($event)",
@@ -152,6 +153,10 @@ export default {
     update(question) {
       const index = this.getQuestionIndex(question.id);
       this.questions.splice(index, 1, question);
+    },
+
+    updateAnswer(question, key) {
+      this.questions.splice(key, 1, question);
     },
   },
 };

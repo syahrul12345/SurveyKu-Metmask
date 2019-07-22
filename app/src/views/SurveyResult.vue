@@ -10,7 +10,7 @@ export default {
     Result,
   },
   created() {
-    this.getResult(this.$route.params.survey_id);
+    this.getResult(this.$route.params.survey_address);
   },
   data() {
     return {
@@ -19,10 +19,10 @@ export default {
     };
   },
   methods: {
-    getResult(surveyId) {
-      axios.post('/getResults', { surveyId })
+    getResult(surveyAddress) {
+      axios.post('/getAnswers', { surveyAddress })
         .then((res) => {
-          this.survey = res.data.survey;
+          this.survey = res.data;
           this.doneLoading = true;
         });
     },

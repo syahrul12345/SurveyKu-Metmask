@@ -1,7 +1,7 @@
 <template lang="pug">
   v-container(grid-list-md)
     v-layout(row, wrap)
-      .display-3.w-100.text-xs-center {{ survey.title }}
+      .display-3.w-100.text-xs-center.mb-3 {{ survey.title }}
 
       v-divider
       v-flex(xs12 v-for="(question , index) in survey.questions" :key="'result'+index")

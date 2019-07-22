@@ -1,5 +1,5 @@
 <template lang="pug">
-    h1 woohoo!
+    Survey(:surveyData="survey" v-if="doneLoading")
 </template>
 
 <script>
@@ -22,10 +22,8 @@ export default {
     getSurvey(surveyAddress) {
       axios.post('/getQuestions', { surveyAddress })
         .then((res) => {
-          console.log(res);
-          // this.survey = res.data.survey;
-          // this.survey.userId = 'grab_xuwhh12';
-          // this.doneLoading = true;
+          this.survey = res.data;
+          this.doneLoading = true;
         });
     },
   },
