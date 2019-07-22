@@ -30,6 +30,10 @@ server.get('/getSurveyIds',async(req,res) => {
 		res.send(result)
 	})
 })
+server.get('/explorer',async(req,res) => {
+	return process.env.URL;
+})
+
 
 /**
 @notice Creats a new survey and populates accordingly with 

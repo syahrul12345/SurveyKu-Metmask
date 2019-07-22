@@ -3,7 +3,7 @@ const Web3 = require('web3');
 dotenv.config();
 
 const web3 = new Web3(
-  new Web3.providers.HttpProvider('http://nd-959-117-562.rg-837-380.p2pify.com:8545'),
+  new Web3.providers.HttpProvider(process.env.RPC1),
   null,
   {
     transactionConfirmationBlocks: 1,
