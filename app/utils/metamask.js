@@ -54,6 +54,7 @@ export const createTracker = async() => {
 		const address = await getAddress(web3js)
 		 try {
 			const trackerContract = await deployTracker(web3js,abiTracker,bytecodeTracker)
+			console.log("trackerCreated")
 			console.log(trackerContract.options.address)
 		}catch(ex) {
 			console.log('Only the daddy account can create trackers')
@@ -63,35 +64,6 @@ export const createTracker = async() => {
 		console.log('web3 doesnt exist')
 	}
 
-
-	//new features
-	// if(window.ethereum) {
-	// 	const accounts = await window.ethereum.enable()
-	// 	const from = accounts[0]
-	// 	const params = [paramBuild({
-	// 		"gas": "47000000",
-	// 		"gasPrice": "0",
-	// 		"from":accounts[0],
-	// 		"data": bytecodeTracker,
-	// 	})];
-	// 	ethereum.send({
-	// 	  method: 'eth_sendTransaction',
-	// 	  params: params,
-	// 	  from, // Provide the user's account to use.
-	// 	},(err,result) => {
-	// 		if(err) console.log(err)
-	// 		const params2 = [result.result]
-	// 		ethereum.send({
-	// 			method:'eth_getTransactionReceipt',
-	// 			params: params2,
-	// 		},(err,result) => {
-	// 			if(err) console.log(err)
-	// 			console.log(result.result.contractAddress)
-	// 		})
-	// 	})
-	// }else {
-	// 	console.log("metamask not not detected")
-	// }
 }
 
 
@@ -101,88 +73,43 @@ export const createTracker = async() => {
 @dev
 **/
 export const createSurvey = async(surveyBody) => {
-	// if(typeof web3 !== 'undefined') {
-	// 	try {
-	// 	    const survey = surveyBody;
-	// 	    const web3js = new Web3(web3.currentProvider,null,{transactionConfirmationBlocks: 1})
-	// 	    const title = survey.title;
-	// 	    const questions = survey.questions;
-	// 	    const promiseArray = [
-	// 	      deployContract(web3js,abiSurvey,bytecodeSurvey,title),
-	// 	      getAddress(web3js),
-	// 	      getTracker(web3js,abiTracker, bytecodeTracker,'0xe1590a10E3d7BA8e2c42194f1faD4504318Af0A3'),
-	// 	    ];
-	// 	    Promise.all(promiseArray).then(result => {
-	// 	      const surveyContract = result[0];
-	// 	      const trackerContract = result[2];
-	// 	      const surveyContractAddress = surveyContract.options.address;
-	// 	      const currentAccount = result[1];
-	// 	      trackerContract.methods
-	// 	        .addSurvey(surveyContractAddress)
-	// 	        .send({
-	// 	          from: currentAccount,
-	// 	        })
-	// 	        .then(async result => {
-	// 	          const questionPromiseArray = [];
-	// 	          questions.forEach(item => {
-	// 	            const options = item.options;
-	// 	            stringToBytes32(options).then(async result => {
-	// 	              const questionHex = await web3js.utils.fromAscii(item.text);
-	// 	              //result is in bytes32
-	// 	              questionPromiseArray.push(
-	// 	                surveyContract.methods
-	// 	                  .createQuestion(questionHex, result)
-	// 	                  .send({
-	// 	                    from: currentAccount,
-	// 	                    gas: 470000000,
-	// 	                  }),
-	// 	              );
-	// 	            });
-	// 	          });
-	// 	          Promise.all(questionPromiseArray).then(result => {
-	// 	            console.log(result)
-	// 	          });
-	// 	        });
-	// 	    });
-	//   } catch (ex) {
-	//     res.status(500).send(ex.toString());
-	//   }
-		
-	// }else {
-	// 	console.log('web3 doesnt exist')
-	// }
-	//using JSON-RPC instead of web3
-	if(window.ethereum) {
+	if(window.web3) {
+		const web3js = new Web3(web3.currentProvider,null, {transactionConfirmationBlocks: 1})
 		const accounts = await window.ethereum.enable()
-		console.log(surveyBody.title)
-		const from = accounts[0]
-		const params = [paramBuild({
-			"gas": "47000000",
-			"gasPrice": "0",
-			"from":accounts[0],
-			"data": bytecodeSurvey,
-		})];
-		ethereum.send({
-		  method: 'eth_sendTransaction',
-		  params: params,
-		  from, // Provide the user's account to use.
-		},(err,result) => {
-			if(err) console.log(err)
-			const params2 = [result.result]
-			ethereum.send({
-				method:'eth_getTransactionReceipt',
-				params: params2,
-			},(err,result) => {
-				if(err) console.log(err)
-				console.log(result.result.contractAddress)
-			})
-		})
-	}else {
+		const title = surveyBody.title;
+		try {
+			const surveyContract = await deployContract(web3js,abiSurvey,bytecodeSurvey,title)
+			console.log('new survey created')
+			console.log(surveyContract.options.address)
+		} catch(ex) {
+			console.log(ex.toString())
+		}
+		
+		
+	} else {
 		console.log("NO METAMASK")
 	}
 }
 
+export const surveyTitle = async(surveyAddress) => {
+	if(window.ethereum) {
+		const web3js = new Web3(web3.currentProvider)
+		const accounts = await window.ethereum.enable()
+		const from = accounts[0]
+		try {
+			const trackerAddress = '0xdEAD8C48cdcF1d0CeAC0c18855b155318d86A963'
+			const trackerContract = await getTracker(web3js,abiTracker,bytecodeTracker,trackerAddress)
+			trackerContract.methods.getSurveyTitleByAddress(surveyAddress).call({}).then(console.log)
+		}catch (ex) {
+			console.log(ex.toString())
+		}
+	}else {
+		console.log("no metamask")
+	}
+}
 /**
+
+
 @notice This function will not work until EIP2015 is implemented!
 @dev
 **/

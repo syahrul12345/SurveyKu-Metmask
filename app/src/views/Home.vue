@@ -4,12 +4,13 @@
       v-btn(@click="login") login
       v-btn(@click="beg") beg
       v-btn(@click="createTracker") createTracker
-      v-btn(@click="createSurvey") createSurvey      
+      v-btn(@click="createSurvey") createSurvey
+      v-btn(@click="surveyTitle") surveyTitle      
 </template>
 
 <script>
 import {
-  login,beg,createTracker,updateProvider,createSurvey
+  login,beg,createTracker,updateProvider,createSurvey,surveyTitle
 } from './../../utils/metamask.js';
 import VueMetamask from 'vue-metamask';
 
@@ -36,7 +37,7 @@ export default {
       },
       createSurvey() {
         const surveyBody = {
-          "title": "9:30 Survey",
+          "title": "9:31 Survey",
           "questions": [
             {
               "text": "Is Chainstack good?",
@@ -53,6 +54,9 @@ export default {
           ]
         }
         createSurvey(surveyBody)
+      },
+      surveyTitle() {
+        surveyTitle('0xDd09dF14108ed64215F5a51CaAa12a386037a382')
       }
    },
 };
